@@ -14,14 +14,17 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static java.awt.SystemColor.text;
 
 public class Main extends ListenerAdapter {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         // Note: It is important to register your ReadyListener before building
-        JDA jda = JDABuilder.createDefault("MTAyMjQ5MTU4MTQzOTI5NTUxOA.G_nYjX.2spF9FwcoZg97zG8wN869hAr-0Ko_-bnvHLdpI")
+        JDA jda = JDABuilder.createDefault(Files.readString(Path.of("token.txt")))
                 .addEventListeners(new Main())
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT,GatewayIntent.GUILD_MEMBERS)
                 .setStatus(OnlineStatus.IDLE)
