@@ -22,6 +22,10 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
+    from(rootDir) {
+        include 'token.txt'
+    }
+
     manifest {
         attributes("Main-Class": "com.buddha.Main")
     }

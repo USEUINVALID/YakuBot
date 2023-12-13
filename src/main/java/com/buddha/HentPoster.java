@@ -16,7 +16,7 @@ public class HentPoster {
                         .url("http://api.nekos.fun:8080/api/" + tag)
                         .build())
                 .execute()) {
-            return gson.fromJson(Objects.requireNonNull(response.body()).string(), ImageResponse.class).image;
+            return response.isSuccessful() ? gson.fromJson(Objects.requireNonNull(response.body()).string(), ImageResponse.class).image : response.message();
         } catch (Exception e) {
             return e.toString();
         }

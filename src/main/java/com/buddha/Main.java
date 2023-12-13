@@ -10,18 +10,32 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.*;
 
 public class Main extends ListenerAdapter {
+    public static final Path tokenPath = Path.of("token.txt");
+
     public static void main(String[] args) throws InterruptedException, IOException {
-        // Note: It is important to register your ReadyListener before building
-        JDA jda = JDABuilder.createDefault(Files.readString(Path.of("token.txt")))
+        // Существует ли файл с токеном?
+        var token = Files.exists(tokenPath) ?
+                // Если да, считываем его
+                Files.readString(tokenPath) :
+                // Если нет, загружаем токен из джарника
+                // Я ебал сканнеры, но тут без них никак
+                new Scanner(Objects.requireNonNull(Main.class.getResourceAsStream("token.txt"))).nextLine();
+
+        // Создаем объект бота
+        var jda = JDABuilder.createDefault(token)
+                // Добавляем отслеживание ивентов
                 .addEventListeners(new Main())
+                // Врубаем доступ к тексту сообщений и данным юзеров
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
+                // Делаем бота легендой
                 .setStatus(OnlineStatus.IDLE)
                 .setActivity(Activity.listening("Pyrokinesis Playlist"))
                 .build();
 
-        // optionally block until JDA is ready
+        // Эта хуйня нужна чтобы бот не вырубался
         jda.awaitReady();
     }
 
