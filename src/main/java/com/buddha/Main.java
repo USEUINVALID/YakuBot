@@ -43,8 +43,13 @@ public class Main extends ListenerAdapter {
         }
 
         if (event.getMessage().getContentRaw().startsWith("Финик")) {
-            var elb = event.getMessage().getContentRaw().substring(6, event.getMessage().getContentRaw().length() - 2);
+            var elb = event.getMessage().getContentRaw().substring(6, event.getMessage().getContentRaw().length() - 1);
             event.getMember().modifyNickname(elb).queue();
+        }
+
+        if (event.getMessage().getContentRaw().equalsIgnoreCase("Цинцюэ имба")) {
+            MessageChannel channel = event.getChannel();
+            channel.sendMessage("https://media.discordapp.net/attachments/1076507277793706005/1183740549593841704/IMG_20231206_201306.jpg?ex=65896f4b&is=6576fa4b&hm=49fe02853fadb8b6a09eeb72bfe1fdb98f8f13aab8340499bdd3ce00e1ba5dce&=&format=webp&width=551&height=671").queue();
         }
 
         if (event.getMessage().getContentRaw().startsWith("Пикча ")) {
