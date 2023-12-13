@@ -22,7 +22,7 @@ public class Main extends ListenerAdapter {
                 Files.readString(tokenPath) :
                 // Если нет, загружаем токен из джарника
                 // Я ебал сканнеры, но тут без них никак
-                new Scanner(Objects.requireNonNull(Main.class.getResourceAsStream("token.txt"))).nextLine();
+                new Scanner(Objects.requireNonNull(Main.class.getResourceAsStream("/token.txt"))).nextLine();
 
         // Создаем объект бота
         var jda = JDABuilder.createDefault(token)
