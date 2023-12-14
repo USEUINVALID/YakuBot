@@ -100,17 +100,17 @@ public class Main extends ListenerAdapter {
                 data.drops.add(drop);
 
                 event.getMessage().reply("Ты покрутил!\nВыпало: **" + drop.name + "** (" + dropType + ")\n*" + drop.description + "*\n\nОсталось круток: **" + data.rolls + "**").queue();
-                if(dropType.equalsIgnoreCase("rareDrops")) {
+                if(dropType.equalsIgnoreCase("Редкий")) {
                     MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://tenor.com/ru/view/genshin3star-wish-gif-23716488").queue();
+                    channel.sendMessage("https://media1.tenor.com/m/KGwWGVz9-XQAAAAC/genshin-impact-wish.gif").queue();
                 }
-                if(dropType.equalsIgnoreCase("epicDrops")){
+                if(dropType.equalsIgnoreCase("Эпический")){
                     MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://tenor.com/ru/view/genshin-wish-genshin-impact-rare-purple-gif-26472708").queue();
+                    channel.sendMessage("https://media1.tenor.com/m/JcMSVVkgfgMAAAAC/genshin-wish.gif").queue();
                 }
-                if(dropType.equalsIgnoreCase("legendaryDrops")){
+                if(dropType.equalsIgnoreCase("Легендарный")){
                     MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://tenor.com/ru/view/genshinimpact-taroumaru-taroumaruwish-sakurapond-wangshengfuneralparlor-gif-21983902").queue();
+                    channel.sendMessage("https://media1.tenor.com/m/YQCvYWzR28wAAAAC/wishing.gif").queue();
                 }
 
 
