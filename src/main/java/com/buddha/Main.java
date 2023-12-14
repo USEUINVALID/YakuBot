@@ -100,6 +100,18 @@ public class Main extends ListenerAdapter {
                 data.drops.add(drop);
 
                 event.getMessage().reply("Ты покрутил!\nВыпало: **" + drop.name + "** (" + dropType + ")\n*" + drop.description + "*\n\nОсталось круток: **" + data.rolls + "**").queue();
+                if(dropType.equalsIgnoreCase("rareDrops")) {
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("https://tenor.com/ru/view/genshin3star-wish-gif-23716488").queue();
+                }
+                if(dropType.equalsIgnoreCase("epicDrops")){
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("https://tenor.com/ru/view/genshin-wish-genshin-impact-rare-purple-gif-26472708").queue();
+                }
+                if(dropType.equalsIgnoreCase("legendaryDrops")){
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("https://tenor.com/ru/view/genshinimpact-taroumaru-taroumaruwish-sakurapond-wangshengfuneralparlor-gif-21983902").queue();
+                }
             } else {
                 event.getMessage().reply("Ты проебал все крутки!\nМолодец!").queue();
             }
