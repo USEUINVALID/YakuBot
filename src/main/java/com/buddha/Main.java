@@ -112,6 +112,7 @@ public class Main extends ListenerAdapter {
                     MessageChannel channel = event.getChannel();
                     channel.sendMessage("https://tenor.com/ru/view/genshinimpact-taroumaru-taroumaruwish-sakurapond-wangshengfuneralparlor-gif-21983902").queue();
                 }
+
             } else {
                 event.getMessage().reply("Ты проебал все крутки!\nМолодец!").queue();
             }
