@@ -16,6 +16,11 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
+    implementation("org.xerial:sqlite-jdbc:3.44.1.0")
+    implementation("com.j256.ormlite:ormlite-jdbc:6.1")
+
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 jar {
     from {
