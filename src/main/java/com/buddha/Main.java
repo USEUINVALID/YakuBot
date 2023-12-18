@@ -1,6 +1,7 @@
 package com.buddha;
 
 import com.buddha.Database.UserData.Drop;
+import com.buddha.Database.UserData.Drop.Rarity;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.middleman.*;
@@ -61,7 +62,7 @@ public class Main extends ListenerAdapter {
 
         if (content.contains("дать крутки")) {
             var aut = event.getAuthor();
-            var N = Integer.parseInt(event.getMessage().getContentRaw().substring(event.getMessage().getContentRaw().length()-2));
+            var N = Integer.parseInt(event.getMessage().getContentRaw().substring(event.getMessage().getContentRaw().length() - 2));
             if (aut.getIdLong() == 647466682675363847L) {
                 event.getMessage().getMentions().getUsers().forEach(user -> {
 
@@ -73,6 +74,7 @@ public class Main extends ListenerAdapter {
                 });
             }
         }
+
         if (content.contains("самокрутка")) {
             var aut = event.getAuthor();
             var N = 100;
@@ -80,8 +82,8 @@ public class Main extends ListenerAdapter {
                 var data = Database.getUserData(event.getAuthor().getIdLong());
                 data.rolls += N;
                 MessageChannel channel = event.getChannel();
-                channel.sendMessage("увеличил крутки " + "гения" +  " на " + N).queue();
-                    Database.saveUserData(data);
+                channel.sendMessage("увеличил крутки " + "гения" + " на " + N).queue();
+                Database.saveUserData(data);
             }
         }
 
@@ -112,36 +114,30 @@ public class Main extends ListenerAdapter {
             event.getMessage().reply(url).queue();
         }
 
-        if (content.equals("крутка")) {
+        if (content.equals("крутка") || content.equals("крутки")) {
+            int amount = content.equals("крутка") ? 1 : 10;
+
             var data = Database.getUserData(event.getAuthor().getIdLong());
-            if (data.rolls > 0) {
-                var chance = random.nextFloat();
+            if (data.rolls >= amount) {
+                var builder = new StringBuilder();
+                var bestRarity = Rarity.rare;
 
-                var dropType = chance <= Drop.legendaryDropChance ? "Легендарный" : chance <= Drop.epicDropChance ? "Эпический" : "Редкий";
-                var drops = Drop.dropTypeNames.get(dropType);
+                for (int i = 0; i < amount; i++) {
+                    var rarity = Rarity.getRarity(random.nextFloat());
+                    var drop = Drop.getRandomDrop(rarity);
 
-                var drop = drops.get(random.nextInt(drops.size()));
+                    data.rolls--;
+                    data.drops.put(drop, data.drops.getOrDefault(drop, 0L) + 1);
 
-                data.rolls--;
-                data.drops.add(drop);
-
-                event.getMessage().reply("Ты покрутил!\nВыпало: **" + drop.name + "** (" + dropType + ")\n*" + drop.description + "*\n\nОсталось круток: **" + data.rolls + "**").queue();
-                if (dropType.equalsIgnoreCase("Редкий")) {
-                    MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://media1.tenor.com/m/KGwWGVz9-XQAAAAC/genshin-impact-wish.gif").queue();
-                }
-                if (dropType.equalsIgnoreCase("Эпический")) {
-                    MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://media1.tenor.com/m/JcMSVVkgfgMAAAAC/genshin-wish.gif").queue();
-                }
-                if (dropType.equalsIgnoreCase("Легендарный")) {
-                    MessageChannel channel = event.getChannel();
-                    channel.sendMessage("https://media1.tenor.com/m/YQCvYWzR28wAAAAC/wishing.gif").queue();
+                    builder.append("\n- **").append(drop.name).append("** (").append(rarity.name).append(") - *").append(drop.description).append("*");
+                    if (rarity.ordinal() > bestRarity.ordinal())
+                        bestRarity = rarity;
                 }
 
-
+                event.getMessage().reply("Ты покрутил!\nВыпало: " + builder + "\n\nОсталось круток: **" + data.rolls + "**").queue();
+                event.getMessage().getChannel().sendMessage(bestRarity.animation).queue();
             } else {
-                event.getMessage().reply("Ты проебал все крутки!\nМолодец!").queue();
+                event.getMessage().reply("У тебя не хватает круток. Всего их у тебя: " + data.rolls).queue();
             }
 
             Database.saveUserData(data);
@@ -154,7 +150,7 @@ public class Main extends ListenerAdapter {
             builder.append("\n**Крутки:**").append("\n- ").append(data.rolls);
             builder.append("\n**Дропы:**");
 
-            data.drops.forEach(drop -> builder.append("\n- ").append(drop.name));
+            data.drops.forEach((drop, amount) -> builder.append("\n- ").append(drop.name).append(" (").append(amount).append(")"));
 
             if (data.drops.isEmpty())
                 builder.append("\n<нихуя тут нет>");

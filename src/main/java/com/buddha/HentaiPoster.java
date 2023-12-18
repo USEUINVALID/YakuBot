@@ -9,7 +9,7 @@ import java.util.*;
 public class HentaiPoster {
 
     public static final List<String> hentaiTags = List.of(
-            "4k", "bellevid", "cum", "gif", "laugh", "pat", "spank",
+            "4k", "bellevid", "cry", "cum", "gif", "laugh", "pat", "spank",
             "anal", "bj", "feet", "hentai", "lesbian", "poke", "tickle",
             "animalears", "blowjob", "feet", "holo", "lewd", "pussy", "waifu",
             "baka", "boobs", "foxgirl", "hug", "lick", "slap", "wallpapers",
