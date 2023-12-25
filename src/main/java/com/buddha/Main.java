@@ -3,7 +3,7 @@ package com.buddha;
 import com.buddha.Database.UserData.Drop;
 import com.buddha.Database.UserData.Drop.Rarity;
 import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.*;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main extends ListenerAdapter {
     public static final Path tokenPath = Path.of("token.txt");
@@ -52,38 +53,37 @@ public class Main extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
+        if (event.getAuthor().isBot())
             return;
-        }
 
         // Текст сообщения в нижнем регистре
         var content = event.getMessage().getContentRaw().toLowerCase();
         if (content.isBlank()) return;
 
-        if (content.contains("дать крутки")) {
-            var aut = event.getAuthor();
-            var N = Integer.parseInt(event.getMessage().getContentRaw().substring(event.getMessage().getContentRaw().length() - 2));
-            if (aut.getIdLong() == 647466682675363847L) {
-                event.getMessage().getMentions().getUsers().forEach(user -> {
+        if (content.startsWith("дать крутки ")) {
+            var users = event.getMessage().getMentions().getUsers();
 
+            for (var user : users)
+                content = content.replace("<@" + user.getIdLong() + ">", "");
+
+            content = content.substring("дать крутки ".length());
+            content = content.strip();
+
+            if (users.isEmpty())
+                users = List.of(event.getAuthor());
+
+            try {
+                int amount = Integer.parseInt(content);
+
+                users.forEach(user -> {
                     var data = Database.getUserData(user.getIdLong());
-                    data.rolls += N;
-                    MessageChannel channel = event.getChannel();
-                    channel.sendMessage("увеличил крутки " + "@" + user.getName() + " на " + N).queue();
+                    data.rolls += amount;
                     Database.saveUserData(data);
                 });
-            }
-        }
 
-        if (content.contains("самокрутка")) {
-            var aut = event.getAuthor();
-            var N = 100;
-            if (aut.getIdLong() == 647466682675363847L) {
-                var data = Database.getUserData(event.getAuthor().getIdLong());
-                data.rolls += N;
-                MessageChannel channel = event.getChannel();
-                channel.sendMessage("увеличил крутки " + "гения" + " на " + N).queue();
-                Database.saveUserData(data);
+                event.getMessage().reply("Успешно! Крутки следующих участников были увеличены на " + amount + "!\n" + users.stream().map(IMentionable::getAsMention).collect(Collectors.joining(", "))).queue();
+            } catch (NumberFormatException e) {
+                event.getMessage().reply("Неверный формат числа!").queue();
             }
         }
 
@@ -108,8 +108,8 @@ public class Main extends ListenerAdapter {
         }
 
         if (content.startsWith("пикча ")) {
-            var tag = event.getMessage().getContentRaw().substring("пикча ".length());
-            var url = HentaiPoster.getImageUrl(tag);
+            var tag = content.substring("пикча ".length());
+            var url = AnimePoster.getImageUrl(tag);
 
             event.getMessage().reply(url).queue();
         }
