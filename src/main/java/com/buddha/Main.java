@@ -21,6 +21,7 @@ import static net.dv8tion.jda.api.utils.TimeFormat.*;
 public class Main extends ListenerAdapter {
     public static final Path tokenPath = Path.of("token.txt");
     public static final Random random = new Random();
+    public static final List<Long> admins = List.of(647466682675363847L,794627738677411861L);
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Database.load();
@@ -67,6 +68,10 @@ public class Main extends ListenerAdapter {
         if (content.isBlank()) return;
 
         if (content.startsWith("дать крутки ")) {
+            if(!admins.contains(event.getAuthor().getIdLong())){
+                event.getMessage().reply("ты не смешарик").queue();
+                return;
+            }
             var users = event.getMessage().getMentions().getUsers();
 
             for (var user : users)
@@ -128,6 +133,7 @@ public class Main extends ListenerAdapter {
 
             event.getMessage().reply(url).queue();
         }
+
 
         if (content.equals("крутка") || content.equals("крутки")) {
             int amount = content.equals("крутка") ? 1 : 10;
