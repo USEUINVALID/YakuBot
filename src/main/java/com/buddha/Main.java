@@ -19,23 +19,27 @@ import static java.util.concurrent.TimeUnit.*;
 import static net.dv8tion.jda.api.utils.TimeFormat.*;
 
 public class Main extends ListenerAdapter {
-    public static final Path tokenPath = Path.of("token.txt");
+    public static final Path propertiesPath = Path.of("bot.properties");
     public static final Random random = new Random();
-    public static final List<Long> admins = List.of(647466682675363847L,794627738677411861L);
+
+    public static long leaveChannelID;
+    public static List<Long> adminsIDs; // = List.of(647466682675363847L, 794627738677411861L);
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Database.load();
 
-        // Существует ли файл с токеном?
-        var token = Files.exists(tokenPath) ?
-                // Если да, считываем его
-                Files.readString(tokenPath) :
-                // Если нет, загружаем токен из джарника
-                // Я осуждаю сканнеры, но тут без них никак
-                new Scanner(Objects.requireNonNull(Main.class.getResourceAsStream("/token.txt"))).nextLine();
+        var properties = new Properties();
+        properties.load(Files.exists(propertiesPath) ? // Существует ли файл с настройками?
+                Files.newInputStream(propertiesPath) : // Если да, считываем его
+                Objects.requireNonNull(Main.class.getResourceAsStream("/token.txt")) // Если нет, загружаем настройки из джарника
+        );
 
-        // Создаем объект бота
-        var jda = JDABuilder.createDefault(token)
+        // Достаем из настроек ID канала для сообщений о вышедших юзерах и айдишники админов
+        leaveChannelID = Long.parseLong(properties.getProperty("leaveChannelID"));
+        adminsIDs = Arrays.stream(properties.getProperty("adminIDs").split(", ")).map(Long::parseLong).toList();
+
+        // Создаем объект бота и пихаем туда токен
+        var jda = JDABuilder.createDefault(properties.getProperty("token"))
                 // Добавляем отслеживание ивентов
                 .addEventListeners(new Main())
                 // Врубаем доступ к тексту сообщений и данным юзеров
@@ -51,15 +55,20 @@ public class Main extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
-        var channel = event.getJDA().getChannelById(GuildMessageChannel.class, 797818788145659914L);
-        channel.sendMessage("User " + event.getUser().getAsMention() + " has left the server.").queue();
+        var channel = event.getJDA().getChannelById(GuildMessageChannel.class, leaveChannelID);
+        if (channel == null) return;
+
+        // Оповещаем о вышедших юзерах
+        channel.sendMessage(event.getUser().getAsMention() + " вышел с сервера...").queue();
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        // Не отслеживаем сообщения в ЛС
         if (!event.isFromGuild())
             return;
 
+        // Игнорируем сообщения от ботов
         if (event.getAuthor().isBot())
             return;
 
@@ -68,12 +77,12 @@ public class Main extends ListenerAdapter {
         if (content.isBlank()) return;
 
         if (content.startsWith("дать крутки ")) {
-            if(!admins.contains(event.getAuthor().getIdLong())){
-                event.getMessage().reply("ты не смешарик").queue();
+            if (!adminsIDs.contains(event.getAuthor().getIdLong())) {
+                event.getMessage().reply("Ты должен быть в списке избранных, чтобы использовать эту команду!").queue();
                 return;
             }
-            var users = event.getMessage().getMentions().getUsers();
 
+            var users = event.getMessage().getMentions().getUsers();
             for (var user : users)
                 content = content.replace("<@" + user.getIdLong() + ">", "");
 
@@ -157,8 +166,14 @@ public class Main extends ListenerAdapter {
                             data.rollsWithoutEpic++;
                             data.rollsWithoutLegendary++;
                         }
-                        case epic -> data.rollsWithoutLegendary++;
-                        case legendary -> data.rollsWithoutEpic++;
+                        case epic -> {
+                            data.rollsWithoutEpic = 0;
+                            data.rollsWithoutLegendary++;
+                        }
+                        case legendary -> {
+                            data.rollsWithoutEpic++;
+                            data.rollsWithoutLegendary = 0;
+                        }
                     }
 
                     var drop = Drop.getRandomDrop(rarity);

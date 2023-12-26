@@ -28,7 +28,7 @@ jar {
     }
 
     from(rootDir) {
-        include 'token.txt'
+        include 'bot.properties'
     }
 
     manifest {
