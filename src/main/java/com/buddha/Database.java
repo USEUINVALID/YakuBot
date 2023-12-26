@@ -60,6 +60,7 @@ public class Database {
             rogatka(Rarity.rare, "Рогатка", "Это рогатка, но на самом деле это лук."),
             dubina(Rarity.rare, "Дубина Переговоров", "Сигна Дилюка."),
             palka(Rarity.rare, "Палка", "Просто палка. Тебя заскамили."),
+            
 
             favoniy(Rarity.epic, "Фавоний", "Бесполезная палка."),
             bennet(Rarity.epic, "Беннет", "Ну... Ему не повезло."),

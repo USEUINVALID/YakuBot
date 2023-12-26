@@ -31,7 +31,7 @@ public class Main extends ListenerAdapter {
         var properties = new Properties();
         properties.load(Files.exists(propertiesPath) ? // Существует ли файл с настройками?
                 Files.newInputStream(propertiesPath) : // Если да, считываем его
-                Objects.requireNonNull(Main.class.getResourceAsStream("/token.txt")) // Если нет, загружаем настройки из джарника
+                Objects.requireNonNull(Main.class.getResourceAsStream("/bot.properties")) // Если нет, загружаем настройки из джарника
         );
 
         // Достаем из настроек ID канала для сообщений о вышедших юзерах и айдишники админов
@@ -52,6 +52,8 @@ public class Main extends ListenerAdapter {
         // Эта фигня нужна чтобы бот не вырубался
         jda.awaitReady();
     }
+
+
 
     @Override
     public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
