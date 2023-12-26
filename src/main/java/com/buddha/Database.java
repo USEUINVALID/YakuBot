@@ -7,6 +7,7 @@ import com.j256.ormlite.table.TableUtils;
 import lombok.*;
 
 import java.sql.SQLException;
+import java.time.*;
 import java.util.*;
 
 import static com.buddha.Main.*;
@@ -47,6 +48,9 @@ public class Database {
 
         @DatabaseField
         public int rollsWithoutLegendary;
+
+        @DatabaseField
+        public long lastCollectTime;
 
         @DatabaseField(dataType = DataType.SERIALIZABLE)
         public EnumMap<Drop, Long> drops = new EnumMap<>(Drop.class);

@@ -15,6 +15,9 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.*;
+import static net.dv8tion.jda.api.utils.TimeFormat.*;
+
 public class Main extends ListenerAdapter {
     public static final Path tokenPath = Path.of("token.txt");
     public static final Random random = new Random();
@@ -87,6 +90,19 @@ public class Main extends ListenerAdapter {
                 event.getMessage().reply("Успешно! Крутки следующих участников были увеличены на " + amount + "!\n" + users.stream().map(IMentionable::getAsMention).collect(Collectors.joining(", "))).queue();
             } catch (NumberFormatException e) {
                 event.getMessage().reply("Неверный формат числа!").queue();
+            }
+        }
+
+        if (content.equals("собрать крутки")) {
+            var data = Database.getUserData(event.getAuthor().getIdLong());
+            if (System.currentTimeMillis() - data.lastCollectTime >= HOURS.toMillis(1L)) {
+                data.lastCollectTime = System.currentTimeMillis();
+                data.rolls += 5;
+
+                event.getMessage().reply("Ты успешно собрал 5 бесплатных круток!").queue();
+                Database.saveUserData(data);
+            } else {
+                event.getMessage().reply("Ты еще не можешь собрать бесплатные крутки! Следующий сбор доступен " + RELATIVE.format(data.lastCollectTime + HOURS.toMillis(1L))).queue();
             }
         }
 
