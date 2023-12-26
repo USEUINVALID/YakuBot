@@ -42,23 +42,29 @@ public class Database {
         @DatabaseField
         public int rolls = 10;
 
+        @DatabaseField
+        public int rollsWithoutEpic;
+
+        @DatabaseField
+        public int rollsWithoutLegendary;
+
         @DatabaseField(dataType = DataType.SERIALIZABLE)
         public EnumMap<Drop, Long> drops = new EnumMap<>(Drop.class);
 
         @AllArgsConstructor
         public enum Drop {
-            rogatka(Rarity.rare, "Рогатка", "Непонятная хуйня, которую ставят на Еимию."),
+            rogatka(Rarity.rare, "Рогатка", "Это рогатка, но на самом деле это лук."),
             dubina(Rarity.rare, "Дубина Переговоров", "Сигна Дилюка."),
             palka(Rarity.rare, "Палка", "Просто палка. Тебя заскамили."),
 
-            favoniy(Rarity.epic, "Фавоний", "Легендарная хуйня."),
-            bennet(Rarity.epic, "Беннет", "Ебучий анлак."),
-            sianka(Rarity.epic, "Сян Лин", "Сука, мне не падает С6 Сянка, отдай блять."),
+            favoniy(Rarity.epic, "Фавоний", "Бесполезная палка."),
+            bennet(Rarity.epic, "Беннет", "Ну... Ему не повезло."),
+            sianka(Rarity.epic, "Сян Лин", "Отдааааааааааааааааай, мне она не падает("),
 
             chicha(Rarity.legendary, "Чича", "Замороженный ребенок. Точно не из моего холодильника."),
-            diluc(Rarity.legendary, "Дилюк", "Перс говна."),
+            diluc(Rarity.legendary, "Дилюк", "Не самый сильный перс."),
             ayaka(Rarity.legendary, "Аяка", "Лучшая вайфочка."),
-            hutava(Rarity.legendary, "Хутава", "Похоронит тебя нахуй.");
+            hutava(Rarity.legendary, "Ху Тао", "Она тебя закопает.");
 
             public final Rarity rarity;
             public final String name;
@@ -74,12 +80,13 @@ public class Database {
 
             @AllArgsConstructor
             public enum Rarity {
-                rare(1f, "Редкий", "https://media1.tenor.com/m/KGwWGVz9-XQAAAAC/genshin-impact-wish.gif"),
-                epic(0.2f, "Эпический", "https://media1.tenor.com/m/JcMSVVkgfgMAAAAC/genshin-wish.gif"),
-                legendary(0.1f, "Легендарный", "https://media1.tenor.com/m/YQCvYWzR28wAAAAC/wishing.gif");
+                rare(1f, "Редкий", "\uD83D\uDD35", "https://media1.tenor.com/m/KGwWGVz9-XQAAAAC/genshin-impact-wish.gif"),
+                epic(0.1f, "Эпический", "\uD83D\uDFE3", "https://media1.tenor.com/m/JcMSVVkgfgMAAAAC/genshin-wish.gif"),
+                legendary(0.01f, "Легендарный", "\uD83D\uDFE1", "https://media1.tenor.com/m/YQCvYWzR28wAAAAC/wishing.gif");
 
                 public final float chance;
                 public final String name;
+                public final String emoji;
                 public final String animation;
 
                 public static Rarity getRarity(float chance) {

@@ -4,7 +4,7 @@ import com.buddha.Database.UserData.Drop;
 import com.buddha.Database.UserData.Drop.Rarity;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.middleman.*;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,7 +27,7 @@ public class Main extends ListenerAdapter {
                 // Если да, считываем его
                 Files.readString(tokenPath) :
                 // Если нет, загружаем токен из джарника
-                // Я ебал сканнеры, но тут без них никак
+                // Я осуждаю сканнеры, но тут без них никак
                 new Scanner(Objects.requireNonNull(Main.class.getResourceAsStream("/token.txt"))).nextLine();
 
         // Создаем объект бота
@@ -41,7 +41,7 @@ public class Main extends ListenerAdapter {
                 .setActivity(Activity.listening("Pyrokinesis Playlist"))
                 .build();
 
-        // Эта хуйня нужна чтобы бот не вырубался
+        // Эта фигня нужна чтобы бот не вырубался
         jda.awaitReady();
     }
 
@@ -53,6 +53,9 @@ public class Main extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        if (!event.isFromGuild())
+            return;
+
         if (event.getAuthor().isBot())
             return;
 
@@ -87,24 +90,20 @@ public class Main extends ListenerAdapter {
             }
         }
 
-        if (content.contains("капибара")) {
-            MessageChannel channel = event.getChannel();
-            channel.sendMessage("https://tenor.com/view/capybara-orange-spa-self-self-care-gif-15986252").queue();
-        }
+        // Легендарная капибара
+        if (content.contains("капибара"))
+            event.getChannel().sendMessage("https://tenor.com/view/capybara-orange-spa-self-self-care-gif-15986252").queue();
 
-        if (content.contains("цинцюэ имба")) {
-            MessageChannel channel = event.getChannel();
-            channel.sendMessage("https://media.discordapp.net/attachments/1076507277793706005/1183740549593841704/IMG_20231206_201306.jpg?ex=65896f4b&is=6576fa4b&hm=49fe02853fadb8b6a09eeb72bfe1fdb98f8f13aab8340499bdd3ce00e1ba5dce&=&format=webp&width=551&height=671").queue();
-        }
+        // Легендарный пивасик
+        if (content.contains("пивасик"))
+            event.getChannel().sendMessage("https://media.discordapp.net/attachments/1025140219525206087/1183889904334282812/MrNDF2Ah5W8.jpg?format=webp&width=671&height=671").queue();
 
-        if (content.startsWith("финик")) {
-            var name = event.getMessage().getContentRaw().substring(6, event.getMessage().getContentRaw().length() - 1);
-            event.getMember().modifyNickname(name).queue();
-        }
+        if (content.startsWith("никнейм ")) {
+            var member = event.getMember();
+            if (member == null)
+                return; // Все сломалось, такого не может быть
 
-        if (content.contains("пивасик")) {
-            MessageChannel channel = event.getChannel();
-            channel.sendMessage("https://media.discordapp.net/attachments/1025140219525206087/1183889904334282812/MrNDF2Ah5W8.jpg?format=webp&width=671&height=671").queue();
+            member.modifyNickname(event.getMessage().getContentRaw().substring("финик ".length())).queue();
         }
 
         if (content.startsWith("пикча ")) {
@@ -124,12 +123,28 @@ public class Main extends ListenerAdapter {
 
                 for (int i = 0; i < amount; i++) {
                     var rarity = Rarity.getRarity(random.nextFloat());
+
+                    if (data.rollsWithoutLegendary == 99) {
+                        data.rollsWithoutLegendary = 0;
+                        rarity = Rarity.legendary;
+                    } else if (data.rollsWithoutEpic == 9) {
+                        data.rollsWithoutEpic = 0;
+                        rarity = Rarity.epic;
+                    } else switch (rarity) {
+                        case rare -> {
+                            data.rollsWithoutEpic++;
+                            data.rollsWithoutLegendary++;
+                        }
+                        case epic -> data.rollsWithoutLegendary++;
+                        case legendary -> data.rollsWithoutEpic++;
+                    }
+
                     var drop = Drop.getRandomDrop(rarity);
 
                     data.rolls--;
                     data.drops.put(drop, data.drops.getOrDefault(drop, 0L) + 1);
 
-                    builder.append("\n- **").append(drop.name).append("** (").append(rarity.name).append(") - *").append(drop.description).append("*");
+                    builder.append("\n").append(rarity.emoji).append(" **").append(drop.name).append("** (").append(rarity.name).append(") - *").append(drop.description).append("*");
                     if (rarity.ordinal() > bestRarity.ordinal())
                         bestRarity = rarity;
                 }
@@ -153,7 +168,7 @@ public class Main extends ListenerAdapter {
             data.drops.forEach((drop, amount) -> builder.append("\n- ").append(drop.name).append(" (").append(amount).append(")"));
 
             if (data.drops.isEmpty())
-                builder.append("\n<нихуя тут нет>");
+                builder.append("\n<тут ничего нет>");
 
             event.getMessage().reply(builder.toString()).queue();
         }
